@@ -89,37 +89,28 @@ def solution(park, routes):
 
     for row, line in enumerate(park):
         if "S" in line:
-            start_row = row
-            start_col = line.index("S")
+            yx = [row, line.index("S")]
             break
 
-    yx = [start_row, start_col]
-
-    move = {
-        "N": (-1, 0),
-        "S": (1, 0),
-        "W": (0, -1),
-        "E": (0, 1),
-    }
+    move = {"N": (-1, 0), "S": (1, 0), "W": (0, -1), "E": (0, 1)}
 
     for route in routes:
         op, n = route.split()
         n = int(n)
         dy, dx = move[op]
 
-        cur_row, cur_col = yx[0], yx[1]
+        count = 0
         for _ in range(n):
-            next_row = cur_row + dy
-            next_col = cur_col + dx
-            out_of_range = not (0 <= next_row < length and 0 <= next_col < width)
-            if out_of_range or park[next_row][next_col] == "X":
+            yx[0] += dy
+            yx[1] += dx
+            count += 1
+
+            if yx[0] < 0 or yx[0] >= length or yx[1] < 0 or yx[1] >= width or park[yx[0]][yx[1]] == "X":
+                yx[0] -= dy * count
+                yx[1] -= dx * count
                 break
-            cur_row, cur_col = next_row, next_col
-        else:
-            yx = [cur_row, cur_col]
 
     return yx
-```
 
 방향별로 4번 반복되던 분기와, 부호 실수가 났던 되돌리기 로직이 모두 사라졌다. 이동은 실제 위치(`yx`)가 아니라 임시 좌표(`cur_row, cur_col`)에서 시험 삼아 진행되고, `n`칸 전부 성공했을 때만 `yx`에 반영되므로 "되돌린다"는 개념 자체가 필요 없어진다.
 
